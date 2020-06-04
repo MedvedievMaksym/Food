@@ -213,4 +213,63 @@ window.addEventListener('DOMContentLoaded', function() {
         ".menu .container",
     ).render();
 
+    //FORMS
+
+    const forms = document.querySelectorAll('form');
+
+
+    const message = {
+        loading: 'Загрузка',
+        success: 'Спасибо! Скоро мы с вами свяжемся',
+        failure: 'Что-то пошло не так...' 
+    };
+
+    // Добавляем на все формы
+    forms.forEach(item => {
+        postData(item);
+    });
+
+    function postData(form) {
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+
+            //создаем новый блок для оповещения состояния статуса
+            let statusMessage = document.createElement('div');
+            statusMessage.classList.add('status');
+            statusMessage.textContent = message.loading;
+            form.append(statusMessage);                     //добавляем сообщение к форме
+
+            //создаем новый запрос к серверу
+            const request = new XMLHttpRequest();
+            request.open('POST', 'server.php');
+
+            // формируем данные от пользователя для отравки на сервер
+            request.setRequestHeader('Content-type', 'application/json');
+            const formData = new FormData(form);            // input должны иметь атрибут name!!!
+            
+            const object = {};
+            formData.forEach(function(value, key){
+                object[key] = value;
+            });
+
+            const json = JSON.stringify(object);
+
+            //отправка данных на сервер
+            request.send(json);
+            
+            request.addEventListener('load', () => {
+                if (request.status === 200) {
+                    console.log(request.response);
+                    statusMessage.textContent = message.success;
+                    form.reset();
+                    setTimeout(() => {
+                        statusMessage.remove();
+                    }, 2000);
+                } else {
+                    statusMessage.textContent = message.failure;
+                }
+            });
+        });
+    }
+
 });
