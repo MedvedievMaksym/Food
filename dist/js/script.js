@@ -239,34 +239,35 @@ window.addEventListener('DOMContentLoaded', function() {
             `;
                    
             form.insertAdjacentElement('afterend', statusMessage);           //добавляем сообщение к форме
-
-            //создаем новый запрос к серверу
-            const request = new XMLHttpRequest();
-            request.open('POST', 'server.php');
-
-            // формируем данные от пользователя для отравки на сервер
-            request.setRequestHeader('Content-type', 'application/json');
+           
+            //Собираем все данные из формы
             const formData = new FormData(form);            // input должны иметь атрибут name!!!
             
+            //трансф. данные в json формат
             const object = {};
             formData.forEach(function(value, key){
                 object[key] = value;
             });
 
-            const json = JSON.stringify(object);
-
-            //отправка данных на сервер
-            request.send(json);
-            
-            request.addEventListener('load', () => {
-                if (request.status === 200) {
-                    console.log(request.response);
-                    showThanksModal(message.success);
-                    form.reset();
-                    statusMessage.remove();
-                } else {
-                    showThanksModal(message.failure);
-                }
+            //создаем новый запрос к серверу
+            fetch('server.php', {
+                method: "POST",
+                headers: {
+                    'Content-type': 'application/json'
+                },
+                body: JSON.stringify(object)
+            })
+            .then(data => data.text())
+            .then(data => {
+                console.log(data);      //выведем в консоль что  вернул сервер
+                showThanksModal(message.success);
+                statusMessage.remove();
+            })
+            .catch(() => {
+                showThanksModal(message.failure);
+            })
+            .finally(() => {
+                form.reset();       
             });
         });
     }
