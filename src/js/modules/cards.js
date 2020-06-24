@@ -58,4 +58,4 @@ function carsd() {
     }
 }
 
-module.exports = carsd;
+export default carsd;
