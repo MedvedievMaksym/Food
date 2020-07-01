@@ -1,6 +1,6 @@
 import {getResource} from '../services/services';
 
-function carsd() {
+function cards() {
     class MenuCard {
         constructor(src, alt, title, deskr, price, parentSelector, ...classes) {
             this.src = src;
@@ -50,4 +50,4 @@ function carsd() {
         });
 }
 
-export default carsd;
+export default cards;
